@@ -1,1 +1,5 @@
-*.exe
+lex.exe
+ANALISADOR_LEXICO_EXEMPLO.lex
+CODIGO_FONTE.txt
+fileteste.c
+lex_exemplo.exe
