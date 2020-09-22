@@ -1,3 +1,6 @@
+#include <conio.h> #include<string.h>
+#include <stdio.h> 
+
 void main() {
     int x;
     x = 10;
@@ -9,7 +12,7 @@ void main() {
     }
 
     if (x == 20) {
-        int x_temp = 0;
+        int x_te = 0;
         printf("valor 20");
     }
 
