@@ -14,15 +14,19 @@
     #define L_CHAVES 2
     #define R_CHAVES 3
 
+    int id;
+
     struct lista_no {
         char lexema[TAM_LEXEMA];
+        int num_lexema;
+        char hash[10];
         struct lista_no *prox;
     };
     typedef struct lista_no LISTA;
     LISTA *tab[QTD_SLOT];
 
     struct vetor_hash {
-        char hash[10];
+        char hash[10];        
         struct vetor_hash *proximo;
     };
     typedef struct vetor_hash HASH;
@@ -31,6 +35,7 @@
     // declaração das funções utilizadas
     void inserirID (int slot, char* lexema);
     char* criar_hash ();
+    char* retorna_ultimo_hash ();
 %}
 
 digito [0-9]
@@ -73,12 +78,17 @@ libs "<"([^\n\t\r])*([a-zA-Z][a-zA-Z0-9_])*".h>"
     printf("abertura bloco de codigo => %s\n", yytext);
     return L_CHAVES;
 }
+{r_chave} {
+    printf("fechamento bloco de codigo => %s\n", yytext);
+    return R_CHAVES;
+}      
 
-{r_chave}       printf("fechamento bloco de codigo => %s\n", yytext);
 {virgula}       printf("virgula => %s\n", yytext);
 {semicolon}     printf("ponto e virgula => %s\n", yytext);
+
 {comentario}.*
 "/*"([^*]|\*+[^*/])*\*+"/"
+
 {digito}+               printf("num inteiro => %s\n", yytext);
 {digito}+"."{digito}*   printf("num decimal => %s\n", yytext);
 {string}                printf("string => %s\n", yytext);
@@ -104,8 +114,7 @@ int main(int argc, char *argv[]) {
     printf("\n**********************************************\n");
 
     int nextToken = -1;
-    LISTA *p;
-    bool recriar_hash = true;
+    id = 0;
 
     yyin = fopen(argv[1], "r");
 
@@ -134,35 +143,70 @@ int main(int argc, char *argv[]) {
         }
         else if (nextToken == IDENTIFICADOR) {
 
-            inserirID(nextToken -1, yytext);
-
-            for (int i = 0; i < QTD_SLOT; i++) {
-                if (tab[i] != NULL) printf("[SLOT %d] %s \n", i, tab[i]->lexema);
-            }
+            inserirID(nextToken -1, yytext);            
         }
         else if (nextToken == L_CHAVES) {
             
-            char* new_hash = criar_hash();
+            bool recriar_hash = true;
+            char* _hash;
             
-            printf("***** hash: %s\n", new_hash);
+            _hash = criar_hash();
             
             while (recriar_hash) {
                 recriar_hash = false;
                 for (int i = 0; i < QTD_HASH; i++) {
-                    if ((vec_hash[i] != NULL) && (strcmp(vec_hash[i]->hash, new_hash) == 0)) {
+                    if ((vec_hash[i] != NULL) && (strcmp(vec_hash[i]->hash, _hash) == 0)) {
                         recriar_hash = true;
                         break;
                     }
                 }
-                /* if (recriar_hash) _hash = '#' + (1000 + ( rand() % 8999 )); */
+                if (recriar_hash) _hash = criar_hash();
             }
-            /* printf("hash: %s\n", _hash); */
+
+            for (int i = 0; i < QTD_HASH; i++) {
+                if (vec_hash[i] == NULL) {
+                    HASH *newhash = NULL;
+                    newhash = (HASH*)malloc(sizeof(HASH));
+                    strcpy(newhash->hash, _hash);
+                    vec_hash[i] = newhash;
+                    break;
+                } 
+                else if (vec_hash[i]->proximo == NULL) {
+                    HASH *newhash = NULL;
+                    newhash = (HASH*)malloc(sizeof(HASH));
+                    newhash->proximo = NULL;
+                    strcpy(newhash->hash, _hash);
+                    vec_hash[i]->proximo = newhash;
+                    break;
+                }
+            }            
+        }
+        else if (nextToken == R_CHAVES) {
+
+            for (int i = 0; i < QTD_HASH; i++) {
+                if (vec_hash[i] == NULL) {
+                    vec_hash[i-1] = NULL;
+                    break;
+                }
+            }
+
         }
     }    
 
     fclose(yyin);
  
     printf("\n**********************************************\n\n");
+
+    for (int i = 0; i < QTD_HASH; i++) {
+        if (vec_hash[i] != NULL) printf("[SLOT %d] %s \n", i, vec_hash[i]->hash);
+    }
+
+
+    for (int i = 0; i < QTD_SLOT; i++) {
+        if (tab[i] != NULL) printf("[SLOT %d] %s \t\t (id, %d) \t (hash, %s)\n", i, tab[i]->lexema, tab[i]->num_lexema, tab[i]->hash);
+    }
+
+
     return 0;    
 }
 
@@ -180,15 +224,23 @@ void inserirID (int slot, char* lexema) {
                 break;
             }
             if (slot_atual->prox == NULL) {
+
                 printf(" --> [AVISO else dentro do while] Inserindo o lexema [%s] no SLOT vazio da tabela de simbolos \n", lexema);
                 colisao = (LISTA*)malloc(sizeof(LISTA));
                 colisao->prox = NULL;
+                colisao->num_lexema = id++;
+
+                char* hash_escopo = retorna_ultimo_hash();
+                if (strcmp(hash_escopo, "@") != 0) 
+                    strcpy(colisao->hash, hash_escopo);
+
                 strcpy(colisao->lexema, lexema);
                 slot_atual->prox = colisao;
 
                 tab[index] = slot_atual;
                 tab[index + 1] = colisao;
                 break;
+
             }
 
             index++;
@@ -197,16 +249,25 @@ void inserirID (int slot, char* lexema) {
         }
     }
     else if (slot_atual == NULL) {
+        
         printf(" --> [AVISO] Inserindo o lexema [%s] no SLOT vazio da tabela de simbolos [TABELA VAZIA] \n", lexema);
         colisao = (LISTA*)malloc(sizeof(LISTA));
         colisao->prox = NULL;
+        colisao->num_lexema = id++;
+        
+        char* hash_escopo = retorna_ultimo_hash();
+        if (strcmp(hash_escopo, "@") != 0) 
+            strcpy(colisao->hash, hash_escopo);
+
         strcpy(colisao->lexema, lexema);
 
         tab[slot] = colisao;
+
     }
 }
 
 char* criar_hash () {
+
     int rand_value = (1000 + ( rand() % 8999 ));
     char str_rand[6];
     char _hash[2] = "#";
@@ -219,4 +280,17 @@ char* criar_hash () {
     strcpy(new_hash, hs);
 
     return new_hash;
+
+}
+
+char* retorna_ultimo_hash () {
+
+    for (int i = 0; i < QTD_HASH; i++) {
+        if ((vec_hash[i] == NULL) && (i > 0)) {
+            return vec_hash[i - 1]->hash;
+        }
+        else if ((vec_hash[i] == NULL) && (i == 0)) return "@";
+    }
+
+    return "@";
 }

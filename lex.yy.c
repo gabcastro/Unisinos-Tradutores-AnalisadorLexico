@@ -549,15 +549,19 @@ char *yytext;
     #define L_CHAVES 2
     #define R_CHAVES 3
 
+    int id;
+
     struct lista_no {
         char lexema[TAM_LEXEMA];
+        int num_lexema;
+        char hash[10];
         struct lista_no *prox;
     };
     typedef struct lista_no LISTA;
     LISTA *tab[QTD_SLOT];
 
     struct vetor_hash {
-        char hash[10];
+        char hash[10];        
         struct vetor_hash *proximo;
     };
     typedef struct vetor_hash HASH;
@@ -566,7 +570,8 @@ char *yytext;
     // declaração das funções utilizadas
     void inserirID (int slot, char* lexema);
     char* criar_hash ();
-#line 570 "lex.yy.c"
+    char* retorna_ultimo_hash ();
+#line 575 "lex.yy.c"
 
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
@@ -717,10 +722,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
 
-#line 65 ".\\identificador_lexico.lex"
+#line 70 ".\\identificador_lexico.lex"
 
 
-#line 724 "lex.yy.c"
+#line 729 "lex.yy.c"
 
 	if ( yy_init )
 		{
@@ -805,27 +810,27 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 67 ".\\identificador_lexico.lex"
+#line 72 ".\\identificador_lexico.lex"
 printf("ponteiro => %s\n", yytext);
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 68 ".\\identificador_lexico.lex"
+#line 73 ".\\identificador_lexico.lex"
 printf("caracter de atribuicao => %s\n", yytext);
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 69 ".\\identificador_lexico.lex"
+#line 74 ".\\identificador_lexico.lex"
 printf("parenteses esquerdo => %s\n", yytext);    
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 70 ".\\identificador_lexico.lex"
+#line 75 ".\\identificador_lexico.lex"
 printf("parenteses direito => %s\n", yytext);
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 72 ".\\identificador_lexico.lex"
+#line 77 ".\\identificador_lexico.lex"
 {
     printf("abertura bloco de codigo => %s\n", yytext);
     return L_CHAVES;
@@ -833,72 +838,75 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 77 ".\\identificador_lexico.lex"
-printf("fechamento bloco de codigo => %s\n", yytext);
+#line 81 ".\\identificador_lexico.lex"
+{
+    printf("fechamento bloco de codigo => %s\n", yytext);
+    return R_CHAVES;
+}      
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 78 ".\\identificador_lexico.lex"
+#line 86 ".\\identificador_lexico.lex"
 printf("virgula => %s\n", yytext);
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 79 ".\\identificador_lexico.lex"
+#line 87 ".\\identificador_lexico.lex"
 printf("ponto e virgula => %s\n", yytext);
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 80 ".\\identificador_lexico.lex"
+#line 89 ".\\identificador_lexico.lex"
 
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 81 ".\\identificador_lexico.lex"
+#line 90 ".\\identificador_lexico.lex"
 
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 82 ".\\identificador_lexico.lex"
+#line 92 ".\\identificador_lexico.lex"
 printf("num inteiro => %s\n", yytext);
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 83 ".\\identificador_lexico.lex"
+#line 93 ".\\identificador_lexico.lex"
 printf("num decimal => %s\n", yytext);
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 84 ".\\identificador_lexico.lex"
+#line 94 ".\\identificador_lexico.lex"
 printf("string => %s\n", yytext);
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 85 ".\\identificador_lexico.lex"
+#line 95 ".\\identificador_lexico.lex"
 printf("palavra reservada => %s\n", yytext);
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 86 ".\\identificador_lexico.lex"
+#line 96 ".\\identificador_lexico.lex"
 printf("operador relacional => %s\n", yytext);
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 87 ".\\identificador_lexico.lex"
+#line 97 ".\\identificador_lexico.lex"
 printf("operador logico => %s\n", yytext);
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 88 ".\\identificador_lexico.lex"
+#line 98 ".\\identificador_lexico.lex"
 printf("operador aritmetico => %s\n", yytext);
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 89 ".\\identificador_lexico.lex"
+#line 99 ".\\identificador_lexico.lex"
 printf("reconhecimento de biblioteca => %s\n", yytext);
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 91 ".\\identificador_lexico.lex"
+#line 101 ".\\identificador_lexico.lex"
 {
     printf("ID => %s\n", yytext);
     return IDENTIFICADOR;
@@ -906,20 +914,20 @@ YY_RULE_SETUP
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 96 ".\\identificador_lexico.lex"
+#line 106 ".\\identificador_lexico.lex"
 
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 98 ".\\identificador_lexico.lex"
+#line 108 ".\\identificador_lexico.lex"
 printf("desconhecido => %s\n", yytext);
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 100 ".\\identificador_lexico.lex"
+#line 110 ".\\identificador_lexico.lex"
 ECHO;
 	YY_BREAK
-#line 923 "lex.yy.c"
+#line 931 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1805,7 +1813,7 @@ int main()
 	return 0;
 	}
 #endif
-#line 100 ".\\identificador_lexico.lex"
+#line 110 ".\\identificador_lexico.lex"
 
 
 int main(int argc, char *argv[]) {
@@ -1813,8 +1821,7 @@ int main(int argc, char *argv[]) {
     printf("\n**********************************************\n");
 
     int nextToken = -1;
-    LISTA *p;
-    bool recriar_hash = true;
+    id = 0;
 
     yyin = fopen(argv[1], "r");
 
@@ -1843,35 +1850,70 @@ int main(int argc, char *argv[]) {
         }
         else if (nextToken == IDENTIFICADOR) {
 
-            inserirID(nextToken -1, yytext);
-
-            for (int i = 0; i < QTD_SLOT; i++) {
-                if (tab[i] != NULL) printf("[SLOT %d] %s \n", i, tab[i]->lexema);
-            }
+            inserirID(nextToken -1, yytext);            
         }
         else if (nextToken == L_CHAVES) {
             
-            char* new_hash = criar_hash();
+            bool recriar_hash = true;
+            char* _hash;
             
-            printf("***** hash: %s\n", new_hash);
+            _hash = criar_hash();
             
             while (recriar_hash) {
                 recriar_hash = false;
                 for (int i = 0; i < QTD_HASH; i++) {
-                    if ((vec_hash[i] != NULL) && (strcmp(vec_hash[i]->hash, new_hash) == 0)) {
+                    if ((vec_hash[i] != NULL) && (strcmp(vec_hash[i]->hash, _hash) == 0)) {
                         recriar_hash = true;
                         break;
                     }
                 }
-                /* if (recriar_hash) _hash = '#' + (1000 + ( rand() % 8999 )); */
+                if (recriar_hash) _hash = criar_hash();
             }
-            /* printf("hash: %s\n", _hash); */
+
+            for (int i = 0; i < QTD_HASH; i++) {
+                if (vec_hash[i] == NULL) {
+                    HASH *newhash = NULL;
+                    newhash = (HASH*)malloc(sizeof(HASH));
+                    strcpy(newhash->hash, _hash);
+                    vec_hash[i] = newhash;
+                    break;
+                } 
+                else if (vec_hash[i]->proximo == NULL) {
+                    HASH *newhash = NULL;
+                    newhash = (HASH*)malloc(sizeof(HASH));
+                    newhash->proximo = NULL;
+                    strcpy(newhash->hash, _hash);
+                    vec_hash[i]->proximo = newhash;
+                    break;
+                }
+            }            
+        }
+        else if (nextToken == R_CHAVES) {
+
+            for (int i = 0; i < QTD_HASH; i++) {
+                if (vec_hash[i] == NULL) {
+                    vec_hash[i-1] = NULL;
+                    break;
+                }
+            }
+
         }
     }    
 
     fclose(yyin);
  
     printf("\n**********************************************\n\n");
+
+    for (int i = 0; i < QTD_HASH; i++) {
+        if (vec_hash[i] != NULL) printf("[SLOT %d] %s \n", i, vec_hash[i]->hash);
+    }
+
+
+    for (int i = 0; i < QTD_SLOT; i++) {
+        if (tab[i] != NULL) printf("[SLOT %d] %s \t\t (id, %d) \t (hash, %s)\n", i, tab[i]->lexema, tab[i]->num_lexema, tab[i]->hash);
+    }
+
+
     return 0;    
 }
 
@@ -1889,15 +1931,23 @@ void inserirID (int slot, char* lexema) {
                 break;
             }
             if (slot_atual->prox == NULL) {
+
                 printf(" --> [AVISO else dentro do while] Inserindo o lexema [%s] no SLOT vazio da tabela de simbolos \n", lexema);
                 colisao = (LISTA*)malloc(sizeof(LISTA));
                 colisao->prox = NULL;
+                colisao->num_lexema = id++;
+
+                char* hash_escopo = retorna_ultimo_hash();
+                if (strcmp(hash_escopo, "@") != 0) 
+                    strcpy(colisao->hash, hash_escopo);
+
                 strcpy(colisao->lexema, lexema);
                 slot_atual->prox = colisao;
 
                 tab[index] = slot_atual;
                 tab[index + 1] = colisao;
                 break;
+
             }
 
             index++;
@@ -1906,16 +1956,25 @@ void inserirID (int slot, char* lexema) {
         }
     }
     else if (slot_atual == NULL) {
+        
         printf(" --> [AVISO] Inserindo o lexema [%s] no SLOT vazio da tabela de simbolos [TABELA VAZIA] \n", lexema);
         colisao = (LISTA*)malloc(sizeof(LISTA));
         colisao->prox = NULL;
+        colisao->num_lexema = id++;
+        
+        char* hash_escopo = retorna_ultimo_hash();
+        if (strcmp(hash_escopo, "@") != 0) 
+            strcpy(colisao->hash, hash_escopo);
+
         strcpy(colisao->lexema, lexema);
 
         tab[slot] = colisao;
+
     }
 }
 
 char* criar_hash () {
+
     int rand_value = (1000 + ( rand() % 8999 ));
     char str_rand[6];
     char _hash[2] = "#";
@@ -1928,4 +1987,17 @@ char* criar_hash () {
     strcpy(new_hash, hs);
 
     return new_hash;
+
+}
+
+char* retorna_ultimo_hash () {
+
+    for (int i = 0; i < QTD_HASH; i++) {
+        if ((vec_hash[i] == NULL) && (i > 0)) {
+            return vec_hash[i - 1]->hash;
+        }
+        else if ((vec_hash[i] == NULL) && (i == 0)) return "@";
+    }
+
+    return "@";
 }
