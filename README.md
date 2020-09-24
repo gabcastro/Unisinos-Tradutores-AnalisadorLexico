@@ -90,15 +90,14 @@ if(idade > 70 && sexo == “masculino”)
 
 ## Como executar <a name = "getting_started"></a> ##
 
-Após a criação do código em `.lex`, é necessário executar o programa Flex Tools para a criação do arquivo C.
+Basta executar o arquivo bat em um terminal
 
-`$ (Flex/GnuWin32/bin): flex.exe identificador_lexico.lex`
-
-Posteriormente gerar o executável através do gcc, e por último executar passando o arquivo de entrada.
-
-Pode ser realizado os três comando executando o `.bat` que está na raiz.
+`$ .\batFile.bat`
 
 ## Referências <a name = "refs"></a> ##
 
 - [Lex - A Lexical Analyzer Generator](http://dinosaur.compilertools.net/lex/index.html)
 - [ASCII](https://pt.wikipedia.org/wiki/ASCII)
+- [Lex Functions](https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.1.0/com.ibm.zos.v2r1.bpxa600/bpxa680.htm)
+- [Lex](http://www.dca.fee.unicamp.br/cursos/EA876/apostila/HTML/node69.html)
+- [Compilador-Analisador Léxico com FLEX + Linguagem C](https://pt.slideshare.net/aldisiogm/compiladoranalisador-lxico-com-flex-linguagem-c)

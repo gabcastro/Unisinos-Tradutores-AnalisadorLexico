@@ -37,12 +37,13 @@
 
     int id_atual;
     int ultima_linha = 0;
+    int ultimo_hash = -1;
 
     char* vetor[100];
 
     struct lista_no {
         char lexema[TAM_LEXEMA];
-        int num_lexema;
+        char endereco[TAM_LEXEMA];
         char hash[10];
         struct lista_no *prox;
     };
@@ -61,6 +62,7 @@
     char* criar_hash ();
     char* retorna_ultimo_hash ();
     void concat_comandos (char* prefix, char* name, char* sufix);
+    void concat_comandos_id (char* prefix, char* name, char* pipe, char* endereco, char* sufix);
 %}
 
 digito [0-9]
@@ -94,42 +96,29 @@ libs "<"([^ \n\t\r])*([a-zA-Z][a-zA-Z0-9_])*".h>"
 
 %%
 
-{ponteiro}      printf("ponteiro => %s\n", yytext);
-{atribuicao}    printf("caracter de atribuicao => %s\n", yytext);
-{l_paren}       printf("parenteses esquerdo => %s\n", yytext);    
-{r_paren}       printf("parenteses direito => %s\n", yytext);
-
-{l_chave} {
-    printf("abertura bloco de codigo => %s\n", yytext);
-    return L_CHAVES;
-}
-{r_chave} {
-    printf("fechamento bloco de codigo => %s\n", yytext);
-    return R_CHAVES;
-}      
-
-{virgula}       printf("virgula => %s\n", yytext);
-{semicolon}     printf("ponto e virgula => %s\n", yytext);
+{ponteiro}      return PONTEIRO;
+{atribuicao}    return ATRIBUICAO;
+{l_paren}       return L_PAREN;
+{r_paren}       return R_PAREN;
+{l_chave}       return L_CHAVES;
+{r_chave}       return R_CHAVES;
+{virgula}       return VIRGULA;
+{semicolon}     return SEMICOLON;
 
 {comentario}.*
 "/*"([^*]|\*+[^*/])*\*+"/"
 
-{digito}+               printf("num inteiro => %s\n", yytext);
-{digito}+"."{digito}*   printf("num decimal => %s\n", yytext);
-{string}                printf("string => %s\n", yytext);
+{digito}+               return DIGITO_INTEIRO;
+{digito}+"."{digito}*   return DIGITO_DECIMAL;
+{string}                return STRING;
 {palavra_reservada}     return PALAVRA_RESERVADA;
-{op_rel}                printf("operador relacional => %s\n", yytext);
-{op_log}                printf("operador logico => %s\n", yytext);
-{op_ari}                printf("operador aritmetico => %s\n", yytext);
-
+{op_rel}                return OP_REL;
+{op_log}                return OP_LOG;
+{op_ari}                return OP_ARI;
 {libs}                  return INCLUDES;
-
-{id} {
-    printf("ID => %s\n", yytext);
-    return IDENTIFICADOR;
-}
-
+{id}                    return IDENTIFICADOR;
 [\n]                    return NOVA_LINHA;
+
 [ \t]+ 
 .                       printf("desconhecido => %s\n", yytext);
 
@@ -167,10 +156,34 @@ int main(int argc, char *argv[]) {
             printf("\n [ERRO] Lexema nao pertence a linguagem \n");
         }
         else if (nextToken == IDENTIFICADOR) {
-            inserirID(nextToken -1, yytext);            
+            inserirID(nextToken -1, yytext);   
+            
+            if ((ultimo_hash == -1) && (tab[0]->prox == NULL)) {
+                printf("ultimo_hash  primeira posicao: %d\n", ultimo_hash);
+                concat_comandos_id("[id, (", yytext, " | ", tab[0]->endereco, ")] ");
+            } 
+            else if ((ultimo_hash == -1) && (tab[0]->prox != NULL)) {
+                for (int i = 1; i < QTD_SLOT; i++) {
+                    if ((tab[i] != NULL) && (strcmp(tab[i]->lexema, yytext) == 0) && (strcmp(tab[i]->hash, "@-1") == 0)) {
+                        printf("ultimo_hash  nova funcao: %d\n", ultimo_hash);
+                        concat_comandos_id("[id, (", yytext, " | ", tab[i]->lexema, ")] ");
+                        break;
+                    }
+                }
+            }
+            else {
+                for (int i = 1; i < QTD_SLOT; i++) {
+                    if ((tab[i] != NULL) && (strcmp(tab[i]->lexema, yytext) == 0) && (strcmp(vec_hash[ultimo_hash]->hash, tab[i]->hash) == 0)) {
+                        concat_comandos_id("[id, (", yytext, " | ", tab[i]->endereco, ")] ");
+                        break;
+                    }
+                }
+            }
         }
         else if (nextToken == L_CHAVES) {
             
+            concat_comandos("[l_chaves, ", yytext, "] ");
+
             bool recriar_hash = true;
             char* _hash;
             
@@ -193,72 +206,47 @@ int main(int argc, char *argv[]) {
                     newhash = (HASH*)malloc(sizeof(HASH));
                     strcpy(newhash->hash, _hash);
                     vec_hash[i] = newhash;
+                    ultimo_hash++;
                     break;
                 } 
-                else if (vec_hash[i]->proximo == NULL) {
-                    HASH *newhash = NULL;
-                    newhash = (HASH*)malloc(sizeof(HASH));
-                    newhash->proximo = NULL;
-                    strcpy(newhash->hash, _hash);
-                    vec_hash[i]->proximo = newhash;
-                    break;
-                }
-            }            
+            }       
         }
         else if (nextToken == R_CHAVES) {
+            
+            concat_comandos("[r_chaves, ", yytext, "] ");
 
             for (int i = 0; i < QTD_HASH; i++) {
                 if (vec_hash[i] == NULL) {
                     vec_hash[i-1] = NULL;
+                    ultimo_hash--;
                     break;
                 }
             }
-
         }
-        else if (nextToken == L_PAREN) {}
-        else if (nextToken == R_PAREN) {}
-        else if (nextToken == VIRGULA) {}
-        else if (nextToken == SEMICOLON) {}
-        else if (nextToken == ATRIBUICAO) {}
-        else if (nextToken == DIGITO_INTEIRO) {}
-        else if (nextToken == DIGITO_DECIMAL) {}
-        else if (nextToken == STRING) {}
-        else if (nextToken == PALAVRA_RESERVADA) {
-            if (strcmp(yytext, "#include") == 0) 
-                concat_comandos("[reservado, ", yytext, "] ");    
-        }
-        else if (nextToken == OP_REL) {}
-        else if (nextToken == OP_LOG) {}
-        else if (nextToken == OP_ARI) {}
-        else if (nextToken == PONTEIRO) {}
-        else if (nextToken == INCLUDES) {
-            char* prefix = "[lib, ";
-            char* name = yytext;
-            char* sufix = "] ";
-            concat_comandos(prefix, name, sufix);
-        }
-        else if (nextToken == NOVA_LINHA) {
-            ultima_linha++;
-        }
+        else if (nextToken == L_PAREN)                      concat_comandos("[l_paren, ", yytext, "] ");
+        else if (nextToken == R_PAREN)                      concat_comandos("[r_paren, ", yytext, "] ");
+        else if (nextToken == VIRGULA)                      concat_comandos("[virgula, ", yytext, "] ");
+        else if (nextToken == SEMICOLON)                    concat_comandos("[ponto&virgula, ", yytext, "] ");
+        else if (nextToken == ATRIBUICAO)                   concat_comandos("[atribuicao, ", yytext, "] ");
+        else if (nextToken == DIGITO_INTEIRO)               concat_comandos("[num_inteiro, ", yytext, "] ");
+        else if (nextToken == DIGITO_DECIMAL)               concat_comandos("[num_dec, ", yytext, "] ");
+        else if (nextToken == STRING)                       concat_comandos("[char, ", yytext, "] ");
+        else if (nextToken == PALAVRA_RESERVADA)            concat_comandos("[palavra reservada, ", yytext, "] ");    
+        else if (nextToken == OP_REL)                       concat_comandos("[op_rel, ", yytext, "] ");
+        else if (nextToken == OP_LOG)                       concat_comandos("[op_log, ", yytext, "] ");
+        else if (nextToken == OP_ARI)                       concat_comandos("[op_ari, ", yytext, "] ");
+        else if (nextToken == PONTEIRO)                     concat_comandos("[ponteiro, ", yytext, "] ");
+        else if (nextToken == INCLUDES)                     concat_comandos("[lib, ", yytext, "] ");
+        else if (nextToken == NOVA_LINHA)                   ultima_linha++;
     }    
 
     fclose(yyin);
  
     printf("\n**********************************************\n\n");
 
-    /* for (int i = 0; i < QTD_HASH; i++) {
-        if (vec_hash[i] != NULL) printf("[SLOT %d] %s \n", i, vec_hash[i]->hash);
-    }
-
-
-    for (int i = 0; i < QTD_SLOT; i++) {
-        if (tab[i] != NULL) printf("[SLOT %d] %s \t\t (id_atual, %d) \t (hash, %s)\n", i, tab[i]->lexema, tab[i]->num_lexema, tab[i]->hash);
-    } */
-
     for (int i = 0; i < 100; i++) {
         if (vetor[i] != NULL) printf("[%d]: %s \n", i, vetor[i]);
     }
-
 
     return 0;    
 }
@@ -281,11 +269,11 @@ void inserirID (int slot, char* lexema) {
                 printf(" --> [AVISO else dentro do while] Inserindo o lexema [%s] no SLOT vazio da tabela de simbolos \n", lexema);
                 colisao = (LISTA*)malloc(sizeof(LISTA));
                 colisao->prox = NULL;
-                colisao->num_lexema = id_atual++;
+                strcpy(colisao->endereco, criar_hash());
 
                 char* hash_escopo = retorna_ultimo_hash();
-                if (strcmp(hash_escopo, "@") != 0) 
-                    strcpy(colisao->hash, hash_escopo);
+                /* if (strcmp(hash_escopo, "@") != 0)  */
+                strcpy(colisao->hash, hash_escopo);
 
                 strcpy(colisao->lexema, lexema);
                 slot_atual->prox = colisao;
@@ -306,11 +294,11 @@ void inserirID (int slot, char* lexema) {
         printf(" --> [AVISO] Inserindo o lexema [%s] no SLOT vazio da tabela de simbolos [TABELA VAZIA] \n", lexema);
         colisao = (LISTA*)malloc(sizeof(LISTA));
         colisao->prox = NULL;
-        colisao->num_lexema = id_atual++;
+        strcpy(colisao->endereco, criar_hash());
         
         char* hash_escopo = retorna_ultimo_hash();
-        if (strcmp(hash_escopo, "@") != 0) 
-            strcpy(colisao->hash, hash_escopo);
+        /* if (strcmp(hash_escopo, "@") != 0)  */
+        strcpy(colisao->hash, hash_escopo);
 
         strcpy(colisao->lexema, lexema);
 
@@ -340,24 +328,25 @@ char* retorna_ultimo_hash () {
 
     for (int i = 0; i < QTD_HASH; i++) {
         if ((vec_hash[i] == NULL) && (i > 0)) {
-            return vec_hash[i - 1]->hash;
+            return vec_hash[i-1]->hash;
         }
-        else if ((vec_hash[i] == NULL) && (i == 0)) return "@";
+        else if ((vec_hash[i] == NULL) && (i == 0)) return "@-1";
     }
 
-    return "@";
+    return "@-1";
 }
 
 
 void concat_comandos (char* prefix, char* name, char* sufix) {
     
     const char* comandos_linha_atual;
+    char* concat_comando;
 
     if (vetor[ultima_linha] != NULL) 
         comandos_linha_atual = vetor[ultima_linha];
-            
-    char* concat_comando;
-    concat_comando = malloc(strlen(comandos_linha_atual) + strlen(prefix) + strlen(name) + strlen(sufix)); 
+
+    concat_comando = malloc(strlen(comandos_linha_atual) + strlen(endereco) + strlen(prefix) + strlen(name) + strlen(sufix)); 
+    
     if (vetor[ultima_linha] != NULL) {
         strcpy(concat_comando, comandos_linha_atual);
         strcat(concat_comando, prefix);
@@ -370,4 +359,29 @@ void concat_comandos (char* prefix, char* name, char* sufix) {
             
     vetor[ultima_linha] = concat_comando;
 
+}
+
+void concat_comandos_id (char* prefix, char* name, char* pipe, char* endereco, char* sufix) {
+
+    const char* comandos_linha_atual;
+    char* concat_comando;
+
+    if (vetor[ultima_linha] != NULL) 
+        comandos_linha_atual = vetor[ultima_linha];
+
+    concat_comando = malloc(strlen(comandos_linha_atual) + strlen(endereco) + strlen(pipe) + strlen(prefix) + strlen(name) + strlen(sufix)); 
+    
+    if (vetor[ultima_linha] != NULL) {
+        strcpy(concat_comando, comandos_linha_atual);
+        strcat(concat_comando, prefix);
+    }
+    else 
+        strcpy(concat_comando, prefix);
+    
+    strcat(concat_comando, name);
+    strcat(concat_comando, pipe);
+    strcat(concat_comando, endereco);
+    strcat(concat_comando, sufix);
+            
+    vetor[ultima_linha] = concat_comando;
 }
