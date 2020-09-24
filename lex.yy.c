@@ -536,39 +536,41 @@ char *yytext;
 #line 1 ".\\identificador_lexico.lex"
 #define INITIAL 0
 #line 4 ".\\identificador_lexico.lex"
-    #include <math.h>
-    #include <string.h>
-    #include <stdbool.h>
-    #include <stdlib.h>
+    // #include <math.h>
+    // #include <string.h>
+    // #include <stdbool.h>
+    // #include <stdlib.h>
 
-    #define QTD_SLOT 100
-    #define TAM_LEXEMA 100
-    #define QTD_HASH 10
+    // #define QTD_SLOT 100
+    // #define TAM_LEXEMA 100
+    // #define QTD_HASH 10
 
-    #define IDENTIFICADOR 1
+    // #define IDENTIFICADOR 1
 
-    #define L_CHAVES 2
-    #define R_CHAVES 3
-    #define L_PAREN 4
-    #define R_PAREN 5
-    #define VIRGULA 6
-    #define SEMICOLON 7
-    #define ATRIBUICAO 8
+    // #define L_CHAVES 2
+    // #define R_CHAVES 3
+    // #define L_PAREN 4
+    // #define R_PAREN 5
+    // #define VIRGULA 6
+    // #define SEMICOLON 7
+    // #define ATRIBUICAO 8
 
-    #define DIGITO_INTEIRO 9
-    #define DIGITO_DECIMAL 10
-    #define STRING 11
-    #define PALAVRA_RESERVADA 12
+    // #define DIGITO_INTEIRO 9
+    // #define DIGITO_DECIMAL 10
+    // #define STRING 11
+    // #define PALAVRA_RESERVADA 12
 
-    #define OP_REL 13
-    #define OP_LOG 14
-    #define OP_ARI 15
+    // #define OP_REL 13
+    // #define OP_LOG 14
+    // #define OP_ARI 15
 
-    #define PONTEIRO 16
+    // #define PONTEIRO 16
 
-    #define INCLUDES 17
+    // #define INCLUDES 17
 
-    #define NOVA_LINHA 18
+    // #define NOVA_LINHA 18
+
+    #include "defines.h" 
 
     int id_atual;
     int ultima_linha = 0;
@@ -598,7 +600,7 @@ char *yytext;
     char* retorna_ultimo_hash ();
     void concat_comandos (char* prefix, char* name, char* sufix);
     void concat_comandos_id (char* prefix, char* name, char* pipe, char* endereco, char* sufix);
-#line 602 "lex.yy.c"
+#line 604 "lex.yy.c"
 
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
@@ -749,10 +751,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
 
-#line 97 ".\\identificador_lexico.lex"
+#line 99 ".\\identificador_lexico.lex"
 
 
-#line 756 "lex.yy.c"
+#line 758 "lex.yy.c"
 
 	if ( yy_init )
 		{
@@ -837,120 +839,120 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 99 ".\\identificador_lexico.lex"
+#line 101 ".\\identificador_lexico.lex"
 return PONTEIRO;
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 100 ".\\identificador_lexico.lex"
+#line 102 ".\\identificador_lexico.lex"
 return ATRIBUICAO;
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 101 ".\\identificador_lexico.lex"
+#line 103 ".\\identificador_lexico.lex"
 return L_PAREN;
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 102 ".\\identificador_lexico.lex"
+#line 104 ".\\identificador_lexico.lex"
 return R_PAREN;
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 103 ".\\identificador_lexico.lex"
+#line 105 ".\\identificador_lexico.lex"
 return L_CHAVES;
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 104 ".\\identificador_lexico.lex"
+#line 106 ".\\identificador_lexico.lex"
 return R_CHAVES;
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 105 ".\\identificador_lexico.lex"
+#line 107 ".\\identificador_lexico.lex"
 return VIRGULA;
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 106 ".\\identificador_lexico.lex"
+#line 108 ".\\identificador_lexico.lex"
 return SEMICOLON;
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 108 ".\\identificador_lexico.lex"
+#line 110 ".\\identificador_lexico.lex"
 
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 109 ".\\identificador_lexico.lex"
+#line 111 ".\\identificador_lexico.lex"
 
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 111 ".\\identificador_lexico.lex"
+#line 113 ".\\identificador_lexico.lex"
 return DIGITO_INTEIRO;
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 112 ".\\identificador_lexico.lex"
+#line 114 ".\\identificador_lexico.lex"
 return DIGITO_DECIMAL;
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 113 ".\\identificador_lexico.lex"
+#line 115 ".\\identificador_lexico.lex"
 return STRING;
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 114 ".\\identificador_lexico.lex"
+#line 116 ".\\identificador_lexico.lex"
 return PALAVRA_RESERVADA;
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 115 ".\\identificador_lexico.lex"
+#line 117 ".\\identificador_lexico.lex"
 return OP_REL;
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 116 ".\\identificador_lexico.lex"
+#line 118 ".\\identificador_lexico.lex"
 return OP_LOG;
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 117 ".\\identificador_lexico.lex"
+#line 119 ".\\identificador_lexico.lex"
 return OP_ARI;
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 118 ".\\identificador_lexico.lex"
+#line 120 ".\\identificador_lexico.lex"
 return INCLUDES;
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 119 ".\\identificador_lexico.lex"
+#line 121 ".\\identificador_lexico.lex"
 return IDENTIFICADOR;
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 120 ".\\identificador_lexico.lex"
+#line 122 ".\\identificador_lexico.lex"
 return NOVA_LINHA;
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 122 ".\\identificador_lexico.lex"
+#line 124 ".\\identificador_lexico.lex"
 
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 123 ".\\identificador_lexico.lex"
+#line 125 ".\\identificador_lexico.lex"
 printf("desconhecido => %s\n", yytext);
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 125 ".\\identificador_lexico.lex"
+#line 127 ".\\identificador_lexico.lex"
 ECHO;
 	YY_BREAK
-#line 954 "lex.yy.c"
+#line 956 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1836,7 +1838,7 @@ int main()
 	return 0;
 	}
 #endif
-#line 125 ".\\identificador_lexico.lex"
+#line 127 ".\\identificador_lexico.lex"
 
 
 int main(int argc, char *argv[]) {
